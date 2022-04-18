@@ -8,16 +8,14 @@ namespace HHVacancyParser.Core.Models
         public string Description { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
 
-        public HeadHunterCompany Company { get; set; } = null!;
-
-        public Uri Link { get; set; } = null!;
+        public HeadHunterCompany? Company { get; set; }
+        public Uri? Link { get; set; } = null!;
+        public HeadHunterSalary? Salary { get; set; }
 
         public DateTime? PublicationDate { get; set; }
 
         public string? RawPublicationDate { get; set; }
         public string? WorkingMethod { get; set; }
-
-        public HeadHunterSalary? Salary { get; set; }
 
         public bool Equals(HeadHunterVacancy other)
         {
@@ -50,11 +48,14 @@ namespace HHVacancyParser.Core.Models
 
         public string ToShortString()
         {
-            return $"{Name} - {Company.Name}*{Location} {Salary}";
+            return $"{Name} - {Company?.Name}*{Location} {Salary}";
         }
 
         public override string ToString()
         {
+            if (Company == null)
+                return Name;
+
             var verifiedCompany = Company.IsVerified ? "✓" : "✖";
             var publicationDate = PublicationDate == null ? RawPublicationDate : PublicationDate.Value.ToShortDateString();
 

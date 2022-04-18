@@ -36,20 +36,22 @@ Console.WriteLine("Укажите сколько страниц нужно пр�
 
 var numberOfPagesString = Console.ReadLine();
 
+const int MaxPages = 10;
+
 if (!string.IsNullOrWhiteSpace(numberOfPagesString) && int.TryParse(numberOfPagesString, out var pages))
 {
     pages = Math.Abs(pages);
 
-    if (pages > 10)
-        pages = 10;
+    if (pages > MaxPages)
+        pages = MaxPages;
 
     request.Pages = pages.GenerateSequence();
 }
 else
 {
-    Console.WriteLine("Введены пустые данные, будет проанализирована первая страница.");
+    Console.WriteLine($"Введены пустые данные, будет проанализировано {MaxPages} страниц");
 
-    request.Pages = new int[] { 1 };
+    request.Pages = MaxPages.GenerateSequence();
 }
 
 Console.WriteLine($"Получаем вакансии с '{HeadHunterEndpoints.Domain}'...");
@@ -66,6 +68,7 @@ if (response.Responses.Count == 0)
 var vacancies = response.Responses
     .Where(x => x.Vacancies != null && x.Vacancies.Length > 0)
     .SelectMany(x => x.Vacancies!)
+    .ExcludeNonVacancies()
     .ToArray();
 
 if (vacancies.Length == 0)

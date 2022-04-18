@@ -45,13 +45,24 @@ namespace HHVacancyParser.Core
         private HeadHunterVacancy[]? GetVacancies(HtmlNode documentNode)
         {
             var node = documentNode.SelectSingleNode("//div[contains(@class, 'vacancy-serp-content')]");
-            var vacancyElements = node.SelectNodes(".//div[contains(@class, 'vacancy-serp-item_redesigned')]");
+            var vacancyElements = node.SelectNodes(".//div[@class = 'vacancy-serp-item']");
 
             if (vacancyElements == null)
                 return null;
 
             var vacancies = vacancyElements.Select(x =>
             {
+                var bodyElement = x.SelectSingleNode(".//div[@class = 'vacancy-serp-item-body__main-info']");
+
+                if (bodyElement == null)
+                {
+                    return new HeadHunterVacancy
+                    {
+                        Name = VacancyConstants.NotAVacancy,
+                        Description = x.InnerHtml
+                    };
+                }
+
                 var vacancy = new HeadHunterVacancy();
 
                 // Html elements of a job

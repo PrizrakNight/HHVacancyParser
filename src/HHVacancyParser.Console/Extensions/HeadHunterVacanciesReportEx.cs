@@ -11,7 +11,7 @@ namespace HHVacancyParser.Console.Extensions
             System.Console.WriteLine("Отчет от: " + report.ReportGenerationDate.ToString("dd.MM.yyyy"));
             System.Console.WriteLine("Проанализировано вакансий: " + report.NumberOfVacancies);
             System.Console.WriteLine("Проанализировано зарплат: " + report.NumberOfSalaries);
-            System.Console.WriteLine("Кол-во вакансий без указанных зарплат: "+ report.QuantityWithoutSalary);
+            System.Console.WriteLine("Кол-во вакансий без указанных зарплат: " + report.QuantityWithoutSalary);
             System.Console.WriteLine("Валюты: " + string.Join(", ", report.SalaryReports.Select(x => x.Currency)));
 
             System.Console.WriteLine();
@@ -25,9 +25,12 @@ namespace HHVacancyParser.Console.Extensions
 
             foreach (var report in reports)
             {
+                System.Console.WriteLine();
+
                 System.Console.Write($"[Кол-во зарплат: {report.NumberOfSalaries}] ");
-                System.Console.Write($"Общая средняя: {report.TotalAverageSalary.ToString(HeadHunterStringFormat.Money)} {report.Currency} ");
+                System.Console.Write($"Общая средняя: {report.TotalAverage.ToString(HeadHunterStringFormat.Money)} {report.Currency} ");
                 System.Console.Write($"Коэффициент вариации: {report.CoefficientOfVariation.ToString(HeadHunterStringFormat.Percent)} ");
+                System.Console.Write($"Медиана: {report.Median.ToString(HeadHunterStringFormat.Money)} ");
                 System.Console.Write($"Среняя вилка:" +
                     $" от {report.AverageSalaryFork.From.ToString(HeadHunterStringFormat.Money)} {report.Currency}" +
                     $" до {report.AverageSalaryFork.To.ToString(HeadHunterStringFormat.Money)} {report.Currency}");

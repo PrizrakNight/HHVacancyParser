@@ -11,8 +11,11 @@ namespace HHVacancyParser.Core.Reports
 
         public int NumberOfSalaries { get; set; }
 
-        public decimal AverageSalaryWithoutForks { get; set; }
-        public decimal TotalAverageSalary { get; set; }
+        public HeadHunterSalary[] Salaries { get; set; } = null!;
+
+        public decimal AverageWithoutForks { get; set; }
+        public decimal TotalAverage { get; set; }
+        public decimal Median { get; set; }
 
         public double CoefficientOfVariation { get; set; }
 
@@ -20,8 +23,8 @@ namespace HHVacancyParser.Core.Reports
 
         public override string ToString()
         {
-            return $"({Currency} | {NumberOfSalaries}) Total: {TotalAverageSalary.ToString(HeadHunterStringFormat.Money)}," +
-                $" Average: {AverageSalaryWithoutForks.ToString(HeadHunterStringFormat.Money)}" +
+            return $"({Currency} | {NumberOfSalaries}) Total: {TotalAverage.ToString(HeadHunterStringFormat.Money)}," +
+                $" Average: {AverageWithoutForks.ToString(HeadHunterStringFormat.Money)}" +
                 $" CoefficientOfVariation: {CoefficientOfVariation.ToString(HeadHunterStringFormat.Percent)}" +
                 $" [Min: {AverageSalaryFork.From.ToString(HeadHunterStringFormat.Money)}," +
                 $" Max: {AverageSalaryFork.To.ToString(HeadHunterStringFormat.Money)}]";

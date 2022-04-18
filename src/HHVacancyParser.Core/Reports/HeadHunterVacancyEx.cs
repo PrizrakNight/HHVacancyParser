@@ -1,4 +1,5 @@
-﻿using HHVacancyParser.Core.Maths;
+﻿using HHVacancyParser.Core.Extensions;
+using HHVacancyParser.Core.Maths;
 using HHVacancyParser.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -40,22 +41,38 @@ namespace HHVacancyParser.Core.Reports
             if (vacancies == null)
                 throw new ArgumentNullException(nameof(vacancies));
 
-            vacancies = vacancies.Where(x => x.Salary != null);
+            vacancies = vacancies.WithSalary();
 
             if (vacancies.Any() == false)
                 return Array.Empty<HeadHunterAverageSalaryReport>();
 
-            var currencyGroups = vacancies.GroupBy(x => x.Salary!.Currency);
+            var currencyGroups = vacancies.GroupByCurrency();
 
             var reports = currencyGroups.Select(x =>
             {
+                var numberOfSalaries = x.Count();
+
                 var report = new HeadHunterAverageSalaryReport
                 {
                     Currency = x.Key,
-                    NumberOfSalaries = x.Count(),
+                    NumberOfSalaries = numberOfSalaries,
+                    Salaries = x.Select(x => x.Salary!).ToArray(),
                     CoefficientOfVariation = x.Select(x => x.Salary!.Value).GetCoefficientOfVariation()
                 };
 
+                // Median Calculation
+                var sortedSalaries = x.Select(x => x.Salary!.Value).OrderBy(x => x);
+                var midSequence = numberOfSalaries / 2;
+
+                if (numberOfSalaries % 2 == 0)
+                {
+                    var median = (sortedSalaries.ElementAt(midSequence - 1) + sortedSalaries.ElementAt(midSequence)) / 2;
+
+                    report.Median = median;
+                }
+                else report.Median = sortedSalaries.ElementAt(midSequence);
+
+                // Average fork calculation
                 var forks = x.Where(x => x.Salary!.Fork != null).Select(x => x.Salary!.Fork);
 
                 if (forks.Any())
@@ -70,12 +87,14 @@ namespace HHVacancyParser.Core.Reports
                     };
                 }
 
-                report.TotalAverageSalary = x.Average(x => x.Salary!.Value);
+                // Calculation of the average minimum edge of forks and without forks
+                report.TotalAverage = x.Average(x => x.Salary!.Value);
 
+                // Calculation of the average without a fork
                 var withoutForks = x.Where(x => x.Salary!.Fork == null);
 
                 if (withoutForks.Any())
-                    report.AverageSalaryWithoutForks = withoutForks.Average(x => x.Salary!.Value);
+                    report.AverageWithoutForks = withoutForks.Average(x => x.Salary!.Value);
 
                 return report;
             });
